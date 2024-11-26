@@ -17,8 +17,6 @@ extern volatile int dTarget;
 //Set the max and min number of pulses, which equates to number of rotations
 const int maxPulses = 3000;
 
-float percentage = 0;
-
 void setup() {
   Serial.begin(9600);
   Wire.begin(3);
@@ -30,43 +28,19 @@ void setup() {
   setupMotors();
 }
 
-void normalize(float& value) {
-  if (value > 1) {
-    value = 1;
+void receiveEvent(int bytesRead) {
+  float data[4];
+
+  if (bytesRead == sizeof(data)) {
+    Wire.readBytes((uint8_t*) data, sizeof(data));
+
+    aTarget = (int) (maxPulses * data[0]);
+    bTarget = (int) (maxPulses * data[1]);
+    cTarget = (int) (maxPulses * data[2]);
+    dTarget = (int) (maxPulses * data[3]);
   }
-  else if (value < 0) {
-    value = 0;
-  }
-}
 
-void receiveEvent() {
-  if (Wire.available()) {
-    uint8_t* byteArray = (uint8_t*) &percentage;
-
-    for (int i = 0; i < 4; i++) {
-      byteArray[i] = Wire.read();
-    }
-    normalize(percentage);
-    aTarget = (int) (maxPulses * percentage);
-
-    for (int i = 0; i < 4; i++) {
-      byteArray[i] = Wire.read();
-    }
-    normalize(percentage);
-    bTarget = (int) (maxPulses * percentage);
-
-    for (int i = 0; i < 4; i++) {
-      byteArray[i] = Wire.read();
-    }
-    normalize(percentage);
-    cTarget = (int) (maxPulses * percentage);
-
-    for (int i = 0; i < 4; i++) {
-      byteArray[i] = Wire.read();
-    }
-    normalize(percentage);
-    dTarget = (int) (maxPulses * percentage);
-  }
+  Serial.println(dTarget);
 }
 
 void loop() {

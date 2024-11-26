@@ -30,26 +30,14 @@ void setup() {
   setupMotors();
 }
 
-void receiveEvent(int howMany) {
-  if (howMany > 0) {
-    uint8_t* byteArray = (uint8_t*) &percentage;
+void receiveEvent(int bytesRead) {
+  float data[3];
 
-    for (int i = 0; i < 4; i++) {
-      byteArray[i] = Wire.read();
-    }
-    aTarget = (int) (maxPulsesCMC * percentage);
-
-    for (int i = 0; i < 4; i++) {
-      byteArray[i] = Wire.read();
-    }
-    bTarget = (int) (maxPulsesMCP * percentage);
-
-    for (int i = 0; i < 4; i++) {
-      byteArray[i] = Wire.read();
-    }
-    cTarget = (int) (maxPulsesIP * percentage);
-
-    Serial.println(percentage);
+  if (bytesRead == sizeof(data)) {
+    Wire.readBytes((uint8_t*) data, sizeof(data));
+    aTarget = (int) (maxPulsesCMC * data[0]);
+    bTarget = (int) (maxPulsesMCP * data[1]);
+    cTarget = (int) (maxPulsesIP * data[2]);
   }
 }
 

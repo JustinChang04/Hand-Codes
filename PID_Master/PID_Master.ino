@@ -58,23 +58,9 @@ void transmitThumb(float CMC, float MCP, float IP) {
   normalize(IP, THUMB_IP);
 
   Wire.beginTransmission(1);
+  float data[3] = {CMC / THUMB_CMC, MCP / THUMB_MCP, IP / THUMB_IP};
 
-  float copy = CMC / THUMB_CMC;
-  byte* byteArray = (byte*) &copy;
-
-  for (int i = 0; i < 4; i++) {
-    Wire.write(byteArray[i]);
-  }
-
-  copy = MCP / THUMB_MCP;
-  for (int i = 0; i < 4; i++) {
-    Wire.write(byteArray[i]);
-  }
-
-  copy = IP / THUMB_IP;
-  for (int i = 0; i < 4; i++) {
-    Wire.write(byteArray[i]);
-  }
+  Wire.write((uint8_t*) data, sizeof(data));
 
   Wire.endTransmission();
 }
@@ -86,28 +72,9 @@ void transmitMCP(float m1, float m2, float m3, float m4) {
   normalize(m4, MCP_PINKY);
   
   Wire.beginTransmission(2);
+  float data[4] = {m1 / MCP_INDEX, m2 / MCP_MIDDLE, m3 / MCP_RING, m4 / MCP_PINKY};
 
-  float copy = m1 / MCP_INDEX;
-  byte* byteArray = (byte*) &copy;
-
-  for (int i = 0; i < 4; i++) {
-    Wire.write(byteArray[i]);
-  }
-
-  copy = m2 / MCP_MIDDLE;
-  for (int i = 0; i < 4; i++) {
-    Wire.write(byteArray[i]);
-  }
-
-  copy = m3 / MCP_RING;
-  for (int i = 0; i < 4; i++) {
-    Wire.write(byteArray[i]);
-  }
-
-  copy = m4 / MCP_PINKY;
-  for (int i = 0; i < 4; i++) {
-    Wire.write(byteArray[i]);
-  }
+  Wire.write((uint8_t*) data, sizeof(data));
 
   Wire.endTransmission();
 }
@@ -119,28 +86,10 @@ void transmitPIP(float p1, float p2, float p3, float p4) {
   normalize(p4, PIP_PINKY);
 
   Wire.beginTransmission(3);
+  float data[4] = {p1 / PIP_INDEX, p2 / PIP_MIDDLE, p3 / PIP_RING, p4 / PIP_PINKY};
 
-  float copy = p1 / PIP_INDEX;
-  byte* byteArray = (byte*) &copy;
-
-  for (int i = 0; i < 4; i++) {
-    Wire.write(byteArray[i]);
-  }
-
-  copy = p2 / PIP_MIDDLE;
-  for (int i = 0; i < 4; i++) {
-    Wire.write(byteArray[i]);
-  }
-
-  copy = p3 / PIP_RING;
-  for (int i = 0; i < 4; i++) {
-    Wire.write(byteArray[i]);
-  }
-
-  copy = p4 / PIP_PINKY;
-  for (int i = 0; i < 4; i++) {
-    Wire.write(byteArray[i]);
-  }
+  Wire.write((uint8_t*) data, sizeof(data));
+  Serial.println(data[0]);
 
   Wire.endTransmission();
 }
@@ -152,28 +101,9 @@ void transmitDIP(float d1, float d2, float d3, float d4) {
   normalize(d4, DIP_PINKY);
 
   Wire.beginTransmission(4);
+  float data[4] = {d1 / DIP_INDEX, d2 / DIP_MIDDLE, d3 / DIP_RING, d4 / DIP_PINKY};
 
-  float copy = d1 / DIP_INDEX;
-  byte* byteArray = (byte*) &copy;
-
-  for (int i = 0; i < 4; i++) {
-    Wire.write(byteArray[i]);
-  }
-
-  copy = d2 / DIP_MIDDLE;
-  for (int i = 0; i < 4; i++) {
-    Wire.write(byteArray[i]);
-  }
-
-  copy = d3 / DIP_RING;
-  for (int i = 0; i < 4; i++) {
-    Wire.write(byteArray[i]);
-  }
-
-  copy = d4 / DIP_PINKY;
-  for (int i = 0; i < 4; i++) {
-    Wire.write(byteArray[i]);
-  }
+  Wire.write((uint8_t*) data, sizeof(data));
 
   Wire.endTransmission();
 }
@@ -210,11 +140,11 @@ void transmitWrist(int left, int right) {
 }
 
 void loop() {
-  transmitMCP(0, 30, 0, 0);
-  transmitPIP(0, 30, 0, 0);
-  transmitDIP(0, 30, 0, 0);
-  transmitThumb(30, 30, 0);
-  // transmitAbduction(0);
+  transmitMCP(0, 0, 0, 0);
+  transmitPIP(0, 0, 0, 0);
+  transmitDIP(0, 0, 0, 0);
+  transmitThumb(0, 0, 0);
+  transmitAbduction(0);
   // transmitWrist(2000, 2000);
 
   // Grapsing scissors
@@ -233,9 +163,9 @@ void loop() {
 
   // Credit card tripod grip
   // transmitMCP(104, 101.93, 0, 0);
-  // transmitPIP(73, 71, 0, 0);
+  // transmitPIP(60, 70, 0, 0);
   // transmitDIP(0, 10, 0, 0);
-  // transmitThumb(40, 52.73, 30);
+  // transmitThumb(20, 52.73, 30);
   // transmitAbduction(0);
 
   // Holding electrical tape
@@ -246,10 +176,10 @@ void loop() {
   // transmitAbduction(0.3);
 
   // Holding a nut
-  // transmitMCP(104, 0, 0, 0);
+  // transmitMCP(80, 0, 0, 0);
   // transmitPIP(73, 0, 0, 0);
   // transmitDIP(0, 0, 0, 0);
-  // transmitThumb(0, 52.73, 30);
+  // transmitThumb(0, 70, 35);
   // transmitAbduction(0);
 
   //Holding scissors
@@ -261,15 +191,25 @@ void loop() {
 
   // Holding a paperclip
   // transmitMCP(104, 0, 0, 0);
-  // transmitPIP(20, 0, 0, 0);
+  // transmitPIP(0, 0, 0, 0);
   // transmitDIP(50, 0, 0, 0);
-  // transmitThumb(10, 52.73, 20);
+  // transmitThumb(10, 0, 40);
   // transmitAbduction(0);
 
-  // transmitMCP(40, 40, 40, 40);
-  // transmitPIP(30, 30, 30, 30);
-  // transmitDIP(30, 30, 30, 30);
-  // transmitThumb(0, 0, 0);
+  // Handshake
+  // transmitMCP(60, 70, 70, 70);
+  // transmitPIP(30, 50, 50, 70);
+  // transmitDIP(30, 30, 50, 70);
+  // transmitThumb(30, 30, 30);
+  // transmitAbduction(0);
+
+  // 2 kg weight
+  // transmitMCP(60, 40, 40, 80);
+  // transmitPIP(40, 30, 30, 60);
+  // transmitDIP(30, 55, 65, 0);
+  // transmitThumb(50, 20, 35);
+  // transmitAbduction(0.9);
 
   // nh.spinOnce();
+  delay(100);
 }

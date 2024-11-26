@@ -96,7 +96,6 @@ void loop() {
   //     break;
   // }
   // level();
-  servoRight.goalPosition(0, 1076);
-  servoLeft.goalPosition(0, 1076);
-  Serial.println(leftPosition);
+  servoRight.ledOn(0, GREEN);
+  servoLeft.ledOn(0, GREEN);
 }

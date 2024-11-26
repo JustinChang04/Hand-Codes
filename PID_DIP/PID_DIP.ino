@@ -9,10 +9,10 @@ extern volatile int numPulsesC;
 extern volatile int numPulsesD;
 
 //Targets for each motor
-extern volatile int target1;
-extern volatile int target2;
-extern volatile int target3;
-extern volatile int target4;
+extern volatile int aTarget;
+extern volatile int bTarget;
+extern volatile int cTarget;
+extern volatile int dTarget;
 
 //Set the max and min number of pulses, which equates to number of rotations
 const int maxPulses = 3000; //Index and middle can do 3100
@@ -25,58 +25,22 @@ void setup() {
 
   //I2C
   Wire.onReceive(receiveEvent);
-  Wire.onRequest(requestEvent);
 
   setupPosition();
   setupMotors();
 }
 
-void normalize(float& value) {
-  if (value > 1) {
-    value = 1;
+void receiveEvent(int bytesRead) {
+  float data[4];
+
+  if (bytesRead == sizeof(data)) {
+    Wire.readBytes((uint8_t*) data, sizeof(data));
+
+    aTarget = (int) (maxPulses * data[0]);
+    bTarget = (int) (maxPulses * data[1]);
+    cTarget = (int) (maxPulses * data[2]);
+    dTarget = (int) (maxPulses * data[3]);
   }
-  else if (value < 0) {
-    value = 0;
-  }
-}
-
-void receiveEvent() {
-  if (Wire.available()) {
-    uint8_t* byteArray = (uint8_t*) &percentage;
-
-    for (int i = 0; i < 4; i++) {
-      byteArray[i] = Wire.read();
-    }
-    normalize(percentage);
-    target1 = (int) (maxPulses * percentage);
-
-    for (int i = 0; i < 4; i++) {
-      byteArray[i] = Wire.read();
-    }
-    normalize(percentage);
-    target2 = (int) (maxPulses * percentage);
-
-    for (int i = 0; i < 4; i++) {
-      byteArray[i] = Wire.read();
-    }
-    normalize(percentage);
-    target3 = (int) (maxPulses * percentage);
-
-    for (int i = 0; i < 4; i++) {
-      byteArray[i] = Wire.read();
-    }
-    normalize(percentage);
-    target4 = (int) (maxPulses * percentage);
-  }
-}
-
-void requestEvent() {
-  bool aComplete = abs(numPulsesA - target1) < 10;
-  bool bComplete = abs(numPulsesB - target2) < 10;
-  bool cComplete = abs(numPulsesC - target3) < 10;
-  bool dComplete = abs(numPulsesD - target4) < 10;
-
-  Wire.write(aComplete && bComplete && cComplete && dComplete);
 }
 
 void loop() {
