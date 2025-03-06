@@ -1,46 +1,46 @@
 #include <ros.h>
-#include <std_msgs/Float32MultiArray.h>
+#include <sensor_msgs/JointState.h>
 #include <Wire.h>
 
 //Limits
-#define THUMB_CMC 106.266
-#define THUMB_MCP 52.73
-#define THUMB_IP 45
+const float THUMB_CMC = 1.0 / 1.8545;
+const float THUMB_MCP = 1.0 / 0.9203;
+const float THUMB_IP = 1.0 / 0.7858;
 
-#define MCP_INDEX 103.14
-#define PIP_INDEX 75.08
-#define DIP_INDEX 68.1
+const float MCP_INDEX = 1.0 / 1.8002;
+const float PIP_INDEX = 1.0 / 1.3104;
+const float DIP_INDEX = 1.0 / 1.1885;
 
-#define MCP_MIDDLE 101.93
-#define PIP_MIDDLE 73.47
-#define DIP_MIDDLE 73.05
+const float MCP_MIDDLE = 1.0 / 1.7791;
+const float PIP_MIDDLE = 1.0 / 1.2823;
+const float DIP_MIDDLE = 1.0 / 1.275;
 
-#define MCP_RING 100.57
-#define PIP_RING 72.93
-#define DIP_RING 73.58
+const float MCP_RING = 1.0 / 1.7553;
+const float PIP_RING = 1.0 / 1.273;
+const float DIP_RING = 1.0 / 1.2842;
 
-#define MCP_PINKY 98.94
-#define PIP_PINKY 72.04
-#define DIP_PINKY 72.06
+const float MCP_PINKY = 1.0 / 1.7269;
+const float PIP_PINKY = 1.0 / 1.2573;
+const float DIP_PINKY = 1.0 / 1.2577;
 
-// volatile float jointArray[3] = {0};
+volatile float jointArray[10] = {0};
 
-// ros::NodeHandle nh;
+ros::NodeHandle nh;
 
-// void messageCb(const std_msgs::Float32MultiArray& msg) {
-//   for (int i = 0; i < 3; i++) {
-//     jointArray[i] = msg.data[i];
-//   }
-// }
+void messageCb(const sensor_msgs::JointState& msg) {
+  for (int i = 0; i < 10; i++) {
+    jointArray[i] = msg.position[i];
+  }
+}
 
-// ros::Subscriber<std_msgs::Float32MultiArray> sub("joints", &messageCb);
+ros::Subscriber<sensor_msgs::JointState> sub("joints", &messageCb);
 
 void setup() {
   Serial.begin(9600);
   Wire.begin();
 
-  // nh.initNode();
-  // nh.subscribe(sub);
+  nh.initNode();
+  nh.subscribe(sub);
 }
 
 void normalize(float& value, float limit) {
@@ -58,7 +58,7 @@ void transmitThumb(float CMC, float MCP, float IP) {
   normalize(IP, THUMB_IP);
 
   Wire.beginTransmission(1);
-  float data[3] = {CMC / THUMB_CMC, MCP / THUMB_MCP, IP / THUMB_IP};
+  float data[3] = {CMC * THUMB_CMC, MCP * THUMB_MCP, IP * THUMB_IP};
 
   Wire.write((uint8_t*) data, sizeof(data));
 
@@ -72,7 +72,7 @@ void transmitMCP(float m1, float m2, float m3, float m4) {
   normalize(m4, MCP_PINKY);
   
   Wire.beginTransmission(2);
-  float data[4] = {m1 / MCP_INDEX, m2 / MCP_MIDDLE, m3 / MCP_RING, m4 / MCP_PINKY};
+  float data[4] = {m1 * MCP_INDEX, m2 * MCP_MIDDLE, m3 * MCP_RING, m4 * MCP_PINKY};
 
   Wire.write((uint8_t*) data, sizeof(data));
 
@@ -86,7 +86,7 @@ void transmitPIP(float p1, float p2, float p3, float p4) {
   normalize(p4, PIP_PINKY);
 
   Wire.beginTransmission(3);
-  float data[4] = {p1 / PIP_INDEX, p2 / PIP_MIDDLE, p3 / PIP_RING, p4 / PIP_PINKY};
+  float data[4] = {p1 * PIP_INDEX, p2 * PIP_MIDDLE, p3 * PIP_RING, p4 * PIP_PINKY};
 
   Wire.write((uint8_t*) data, sizeof(data));
   Serial.println(data[0]);
@@ -101,7 +101,7 @@ void transmitDIP(float d1, float d2, float d3, float d4) {
   normalize(d4, DIP_PINKY);
 
   Wire.beginTransmission(4);
-  float data[4] = {d1 / DIP_INDEX, d2 / DIP_MIDDLE, d3 / DIP_RING, d4 / DIP_PINKY};
+  float data[4] = {d1 * DIP_INDEX, d2 * DIP_MIDDLE, d3 * DIP_RING, d4 * DIP_PINKY};
 
   Wire.write((uint8_t*) data, sizeof(data));
 
@@ -140,10 +140,10 @@ void transmitWrist(int left, int right) {
 }
 
 void loop() {
-  transmitMCP(0, 0, 0, 0);
-  transmitPIP(0, 0, 0, 0);
-  transmitDIP(0, 0, 0, 0);
-  transmitThumb(0, 0, 0);
+  transmitThumb(jointArray[0], jointArray[1], jointArray[2]);
+  transmitMCP(jointArray[4], jointArray[8] , jointArray[12], jointArray[16]);
+  transmitPIP(jointArray[5], jointArray[9] , jointArray[13], jointArray[17]);
+  transmitDIP(jointArray[6], jointArray[10], jointArray[14], jointArray[18]);
   transmitAbduction(0);
   // transmitWrist(2000, 2000);
 
@@ -204,11 +204,18 @@ void loop() {
   // transmitAbduction(0);
 
   // 2 kg weight
-  // transmitMCP(60, 40, 40, 80);
-  // transmitPIP(40, 30, 30, 60);
-  // transmitDIP(30, 55, 65, 0);
-  // transmitThumb(50, 20, 35);
-  // transmitAbduction(0.9);
+  // transmitMCP(60, 40, 60, 60);
+  // transmitPIP(40, 30, 30, 70);
+  // transmitDIP(40, 55, 65, 30);
+  // transmitThumb(70, 20, 20);
+  // transmitAbduction(0.8);
+
+  // Peace sign
+  // transmitMCP(0, 0, 100, 100);
+  // transmitPIP(0, 0, 70, 70);
+  // transmitDIP(0, 0, 20, 30);
+  // transmitThumb(80, 30, 30);
+  // transmitAbduction(0.3);
 
   // nh.spinOnce();
   delay(100);
