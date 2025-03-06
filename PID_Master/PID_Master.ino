@@ -1,5 +1,3 @@
-#include <ros.h>
-#include <sensor_msgs/JointState.h>
 #include <Wire.h>
 
 //Limits
@@ -23,24 +21,13 @@ const float MCP_PINKY = 1.0 / 1.7269;
 const float PIP_PINKY = 1.0 / 1.2573;
 const float DIP_PINKY = 1.0 / 1.2577;
 
-volatile float jointArray[10] = {0};
-
-ros::NodeHandle nh;
-
-void messageCb(const sensor_msgs::JointState& msg) {
-  for (int i = 0; i < 10; i++) {
-    jointArray[i] = msg.position[i];
-  }
-}
-
-ros::Subscriber<sensor_msgs::JointState> sub("joints", &messageCb);
+float jointArray[19] = {0};
+const int totalBytes = sizeof(jointArray) + 1;
+uint8_t buffer[sizeof(jointArray)] = {0};
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Wire.begin();
-
-  nh.initNode();
-  nh.subscribe(sub);
 }
 
 void normalize(float& value, float limit) {
@@ -140,6 +127,14 @@ void transmitWrist(int left, int right) {
 }
 
 void loop() {
+  if (Serial.available() >= totalBytes) {
+    uint8_t header = Serial.read();
+    if (header == 0xAA) {
+      Serial.readBytes(buffer, totalBytes - 1);
+      memcpy(jointArray, buffer, totalBytes - 1);
+    }
+  }
+  
   transmitThumb(jointArray[0], jointArray[1], jointArray[2]);
   transmitMCP(jointArray[4], jointArray[8] , jointArray[12], jointArray[16]);
   transmitPIP(jointArray[5], jointArray[9] , jointArray[13], jointArray[17]);
