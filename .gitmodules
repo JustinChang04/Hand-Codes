@@ -1,0 +1,3 @@
+[submodule "RPI_Master"]
+	path = RPI_Master
+	url = https://github.com/JustinChang04/RPI_Master.git
