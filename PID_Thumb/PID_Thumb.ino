@@ -42,6 +42,5 @@ void receiveEvent(int bytesRead) {
 }
 
 void loop() {
-  // setPosition();
-  Set_PWMC(0);
+   setPosition();
 }

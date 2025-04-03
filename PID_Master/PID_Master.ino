@@ -1,6 +1,6 @@
 #include <Wire.h>
 
-//Limits
+//Limits (1.0 / limit)
 const float THUMB_CMC = 1.0 / 1.8545;
 const float THUMB_MCP = 1.0 / 0.9203;
 const float THUMB_IP = 1.0 / 0.7858;
@@ -21,12 +21,7 @@ const float MCP_PINKY = 1.0 / 1.7269;
 const float PIP_PINKY = 1.0 / 1.2573;
 const float DIP_PINKY = 1.0 / 1.2577;
 
-float jointArray[19] = {0};
-const int totalBytes = sizeof(jointArray) + 1;
-uint8_t buffer[sizeof(jointArray)] = {0};
-
 void setup() {
-  Serial.begin(115200);
   Wire.begin();
 }
 
@@ -127,91 +122,13 @@ void transmitWrist(int left, int right) {
 }
 
 void loop() {
-  if (Serial.available() >= totalBytes) {
-    uint8_t header = Serial.read();
-    if (header == 0xAA) {
-      Serial.readBytes(buffer, totalBytes - 1);
-      memcpy(jointArray, buffer, totalBytes - 1);
-    }
-  }
-  
-  transmitThumb(jointArray[0], jointArray[1], jointArray[2]);
-  transmitMCP(jointArray[4], jointArray[8] , jointArray[12], jointArray[16]);
-  transmitPIP(jointArray[5], jointArray[9] , jointArray[13], jointArray[17]);
-  transmitDIP(jointArray[6], jointArray[10], jointArray[14], jointArray[18]);
+  // Can set to angles between 0 radians and the maximum number of radians specified, all set to 0 for now
+  transmitThumb(0, 0, 0);
+  transmitMCP(0, 0, 0, 0);
+  transmitPIP(0, 0, 0, 0);
+  transmitDIP(0, 0, 0, 0);
   transmitAbduction(0);
-  // transmitWrist(2000, 2000);
-
-  // Grapsing scissors
-  // transmitMCP(100, 100, 0, 0);
-  // transmitPIP(30, 30, 0, 0);
-  // transmitDIP(0, 0, 0, 0);
-  // transmitThumb(0, 0, 20);
-  // transmitAbduction(0);
-
-  // Grasping large disk
-  // transmitMCP(60, 20, 30, 60);
-  // transmitPIP(50, 70, 70, 70);
-  // transmitDIP(10, 20, 10, 0);
-  // transmitThumb(40, 30, 0);
-  // transmitAbduction(0.9);
-
-  // Credit card tripod grip
-  // transmitMCP(104, 101.93, 0, 0);
-  // transmitPIP(60, 70, 0, 0);
-  // transmitDIP(0, 10, 0, 0);
-  // transmitThumb(20, 52.73, 30);
-  // transmitAbduction(0);
-
-  // Holding electrical tape
-  // transmitMCP(70, 70, 0, 0);
-  // transmitPIP(40, 40, 0, 0);
-  // transmitDIP(0, 10, 0, 0);
-  // transmitThumb(20, 30, 0);
-  // transmitAbduction(0.3);
-
-  // Holding a nut
-  // transmitMCP(80, 0, 0, 0);
-  // transmitPIP(73, 0, 0, 0);
-  // transmitDIP(0, 0, 0, 0);
-  // transmitThumb(0, 70, 35);
-  // transmitAbduction(0);
-
-  //Holding scissors
-  // transmitMCP(104, 101.93, 0, 0);
-  // transmitPIP(40, 40, 0, 0);
-  // transmitDIP(0, 0, 0, 0);
-  // transmitThumb(30, 30, 0);
-  // transmitAbduction(0);
-
-  // Holding a paperclip
-  // transmitMCP(104, 0, 0, 0);
-  // transmitPIP(0, 0, 0, 0);
-  // transmitDIP(50, 0, 0, 0);
-  // transmitThumb(10, 0, 40);
-  // transmitAbduction(0);
-
-  // Handshake
-  // transmitMCP(60, 70, 70, 70);
-  // transmitPIP(30, 50, 50, 70);
-  // transmitDIP(30, 30, 50, 70);
-  // transmitThumb(30, 30, 30);
-  // transmitAbduction(0);
-
-  // 2 kg weight
-  // transmitMCP(60, 40, 60, 60);
-  // transmitPIP(40, 30, 30, 70);
-  // transmitDIP(40, 55, 65, 30);
-  // transmitThumb(70, 20, 20);
-  // transmitAbduction(0.8);
-
-  // Peace sign
-  // transmitMCP(0, 0, 100, 100);
-  // transmitPIP(0, 0, 70, 70);
-  // transmitDIP(0, 0, 20, 30);
-  // transmitThumb(80, 30, 30);
-  // transmitAbduction(0.3);
-
-  // nh.spinOnce();
+//  transmitWrist(2000, 2000); Not currently working with wrist
+  
   delay(100);
 }

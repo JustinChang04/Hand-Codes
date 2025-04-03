@@ -44,7 +44,5 @@ void receiveEvent(int bytesRead) {
 }
 
 void loop() {
-  // setPosition();
-  Set_PWMB(100);
-  Serial.println(numPulsesB);
+   setPosition();
 }

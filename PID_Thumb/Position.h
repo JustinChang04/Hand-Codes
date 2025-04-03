@@ -16,7 +16,7 @@ volatile int numPulsesC = 0;
 
 //Targets for each motor
 volatile int aTarget = 0;
-volatile int bTarget = 1000;
+volatile int bTarget = 0;
 volatile int cTarget = 0;
 
 //PID constants
