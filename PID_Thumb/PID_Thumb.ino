@@ -42,6 +42,5 @@ void receiveEvent(int bytesRead) {
 }
 
 void loop() {
-//   setPosition();
-Serial.println(aTarget);
+  setPosition();
 }
