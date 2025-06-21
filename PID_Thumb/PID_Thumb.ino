@@ -13,7 +13,7 @@ extern volatile int bTarget;
 extern volatile int cTarget;
 
 //Set the max and min number of pulses, which equates to number of rotations
-const int maxPulsesCMC = 1800;
+const int maxPulsesCMC = 1800; // Should be 3600 but we increment by 2 each time for some reason
 const int maxPulsesMCP = 2900;
 const int maxPulsesIP = 3300;
 

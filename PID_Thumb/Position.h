@@ -32,10 +32,10 @@ void readPulsesA() {
   int b = digitalRead(E1B);
 
   if (b > 0) {
-    numPulsesA++;
+    numPulsesA += 2;
   }
   else {
-    numPulsesA--;
+    numPulsesA -= 2;
   }
 }
 
