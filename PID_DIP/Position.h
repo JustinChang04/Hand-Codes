@@ -2,14 +2,14 @@
 #define POSITION_H
 //Inputs
 //A is MCP, B is IP, C is CMC
-#define E1A 2
-#define E1B 22
-#define E2A 3
-#define E2B 23
-#define E3A 18
-#define E3B 24
-#define E4A 19
-#define E4B 25
+#define E1A 3
+#define E1B 4
+#define E2A 8
+#define E2B 9
+#define E3A 14
+#define E3B 15
+#define E4A 17
+#define E4B 20
 
 //Track the number of pulses from each motor
 volatile int numPulsesA = 0;
@@ -17,7 +17,7 @@ volatile int numPulsesB = 0;
 volatile int numPulsesC = 0;
 volatile int numPulsesD = 0;
 
-//Target for each motor
+//Targets for each motor
 volatile int aTarget = 0;
 volatile int bTarget = 0;
 volatile int cTarget = 0;
@@ -98,6 +98,7 @@ void setPosition() {
   
   //D's block
   dError = dTarget - numPulsesD;
+  Serial.println(numPulsesD);
   Set_PWMD(kp * dError);
   //End D's block
 }

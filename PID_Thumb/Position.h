@@ -2,12 +2,12 @@
 #define POSITION_H
 //Inputs
 //A is MCP, B is IP, C is CMC
-#define E1A 18
-#define E1B 24
-#define E2A 2
-#define E2B 22
-#define E3A 3
-#define E3B 23
+#define E1A 3
+#define E1B 4
+#define E2A 8
+#define E2B 9
+#define E3A 13
+#define E3B 15
 
 //Track the number of pulses from each motor
 volatile int numPulsesA = 0;
