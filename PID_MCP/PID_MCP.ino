@@ -1,4 +1,5 @@
-#include <Wire.h>
+#include <i2c_driver.h>
+#include <i2c_driver_wire.h>
 #include "Motor.h"
 #include "Position.h"
 
@@ -17,24 +18,14 @@ extern volatile int dTarget;
 //Set the max and min number of pulses, which equates to number of rotations
 const int maxPulses = 3800; //3900
 
-float percentage = 0;
-
-void setup() {
-  Serial.begin(9600);
-  Wire.begin(2);
-
-  //I2C
-  Wire.onReceive(receiveEvent);
-
-  setupPosition();
-  setupMotors();
-}
+extern "C" uint32_t set_arm_clock(uint32_t frequency);
 
 void receiveEvent(int bytesRead) {
-  float data[4];
+  float data[4] = {0.0};
 
-  if (bytesRead == sizeof(data)) {
-    Wire.readBytes((uint8_t*) data, sizeof(data));
+  if (bytesRead >= 16) {
+    Wire1.readBytes((byte*) data, 16);
+
     aTarget = (int) (maxPulses * data[0]);
     bTarget = (int) (maxPulses * data[1]);
     cTarget = (int) (maxPulses * data[2]);
@@ -42,6 +33,21 @@ void receiveEvent(int bytesRead) {
   }
 }
 
+void setup() {
+  set_arm_clock(30000000);
+
+  Serial.begin(9600);
+
+  // I2C
+  Wire1.begin(9);
+  Wire1.setClock(100000);
+  Wire1.onReceive(&receiveEvent);
+
+  setupPosition();
+  setupMotors();
+}
+
 void loop() {
   setPosition();
+  delay(10);
 }

@@ -1,37 +1,37 @@
+#include <i2c_driver.h>
+#include <i2c_driver_wire.h>
 #include <PA12.h>
-#include <Wire.h>
 
-PA12 servoRight(&Serial2, 2, 16);
-PA12 servoLeft(&Serial3, 3, 14);
-
-void setup() {
-  Serial.begin(9600);
-  // put your setup code here, to run once:
-  servoRight.begin(32);
-  servoLeft.begin(32);
-
-  Wire.begin(6);
-  Wire.onReceive(receiveEvent);
-}
+PA12 servoRight(&Serial3, 23, 27);
+PA12 servoLeft(&Serial5, 24, 21);
 
 volatile int leftPosition = 1076;
 volatile int rightPosition = 1076;
 
+extern "C" uint32_t set_arm_clock(uint32_t frequency);
+
 void receiveEvent(int numReceived) {
-  if (numReceived > 0) {
-    uint8_t* byteArray = (uint8_t*) &left;
-
-    for (int i = 0; i < 4; i++) {
-      byteArray[i] = Wire.read();
-    }
-
-    byteArray = (uint8_t*) &right;
-    for (int i = 0; i < 4; i++) {
-      byteArray[i] = Wire.read();
-    }
+  if (numReceived >= 8) {
+    Wire.readBytes((byte*) &leftPosition, sizeof(int));
+    Wire.readBytes((byte*) &rightPosition, sizeof(int));
   }
   
   Serial.println(leftPosition);
+}
+
+void setup() {
+  set_arm_clock(30000000);
+
+  Serial.begin(9600);
+
+  // I2C
+  Wire1.begin(13);
+  Wire1.setClock(100000);
+  Wire1.onReceive(&receiveEvent);
+
+  // Servo setup
+  servoRight.begin(32);
+  servoLeft.begin(32);
 }
 
 bool forward() {

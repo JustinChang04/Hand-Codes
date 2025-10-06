@@ -17,24 +17,13 @@ extern volatile int dTarget;
 //Set the max and min number of pulses, which equates to number of rotations
 const int maxPulses = 3000; //Index and middle can do 3100
 
-float percentage = 0;
-
-void setup() {
-  Serial.begin(9600);
-  Wire.begin(4);
-
-  //I2C
-  Wire.onReceive(receiveEvent);
-
-  setupPosition();
-  setupMotors();
-}
+extern "C" uint32_t set_arm_clock(uint32_t frequency);
 
 void receiveEvent(int bytesRead) {
-  float data[4];
+  float data[4] = {0.0};
 
-  if (bytesRead == sizeof(data)) {
-    Wire.readBytes((uint8_t*) data, sizeof(data));
+  if (bytesRead >= 16) {
+    Wire1.readBytes((byte*) data, 16);
 
     aTarget = (int) (maxPulses * data[0]);
     bTarget = (int) (maxPulses * data[1]);
@@ -43,6 +32,21 @@ void receiveEvent(int bytesRead) {
   }
 }
 
+void setup() {
+  set_arm_clock(30000000);
+
+  Serial.begin(9600);
+  
+  //I2C
+  Wire1.begin(11);
+  Wire1.setClock(100000);
+  Wire1.onReceive(&receiveEvent);
+
+  setupPosition();
+  setupMotors();
+}
+
 void loop() {
    setPosition();
+   delay(10);
 }

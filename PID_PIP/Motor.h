@@ -1,21 +1,21 @@
 #ifndef MOTOR_H
 #define MOTOR_H
 //Outputs
-#define AIN1 0
-#define AIN2 1
-#define A_PWM 2
+#define AIN1 5
+#define AIN2 4
+#define A_PWM 3
 
-#define BIN1 5
-#define BIN2 6
-#define B_PWM 7
+#define BIN1 2
+#define BIN2 1
+#define B_PWM 0
 
-#define CIN1 10
-#define CIN2 11
-#define C_PWM 12
+#define CIN1 11
+#define CIN2 10
+#define C_PWM 9
 
-#define DIN1 21
-#define DIN2 22
-#define D_PWM 23
+#define DIN1 8
+#define DIN2 7
+#define D_PWM 6
 
 void setupMotors() {
   //Output setting
@@ -69,14 +69,14 @@ void Set_PWMA(int pwm) {
 
   if(pwm>0)
   {
-    digitalWrite(AIN1, HIGH);
-    digitalWrite(AIN2, LOW);
+    digitalWrite(AIN1, LOW);
+    digitalWrite(AIN2, HIGH);
     analogWrite(A_PWM, pwm);
   }
   else
   {
-    digitalWrite(AIN1, LOW);
-    digitalWrite(AIN2, HIGH);
+    digitalWrite(AIN1, HIGH);
+    digitalWrite(AIN2, LOW);
     analogWrite(A_PWM, 0 - pwm);
   }
 }
@@ -87,14 +87,14 @@ void Set_PWMB(int pwm) {
 
   if(pwm>0)
   {
-    digitalWrite(BIN1, HIGH);
-    digitalWrite(BIN2, LOW);
+    digitalWrite(BIN1, LOW);
+    digitalWrite(BIN2, HIGH);
     analogWrite(B_PWM, pwm);
   }
   else
   {
-    digitalWrite(BIN1, LOW);
-    digitalWrite(BIN2, HIGH);
+    digitalWrite(BIN1, HIGH);
+    digitalWrite(BIN2, LOW);
     analogWrite(B_PWM, 0 - pwm);
   }
 }
@@ -105,14 +105,14 @@ void Set_PWMC(int pwm) {
 
   if(pwm>0)
   {
-    digitalWrite(CIN1, HIGH);
-    digitalWrite(CIN2, LOW);
+    digitalWrite(CIN1, LOW);
+    digitalWrite(CIN2, HIGH);
     analogWrite(C_PWM, pwm);
   }
   else
   {
-    digitalWrite(CIN1, LOW);
-    digitalWrite(CIN2, HIGH);
+    digitalWrite(CIN1, HIGH);
+    digitalWrite(CIN2, LOW);
     analogWrite(C_PWM, 0 - pwm);
   }
 }
@@ -123,14 +123,14 @@ void Set_PWMD(int pwm) {
 
   if(pwm>0)
   {
-    digitalWrite(DIN1, HIGH);
-    digitalWrite(DIN2, LOW);
+    digitalWrite(DIN1, LOW);
+    digitalWrite(DIN2, HIGH);
     analogWrite(D_PWM, pwm);
   }
   else
   {
-    digitalWrite(DIN1, LOW);
-    digitalWrite(DIN2, HIGH);
+    digitalWrite(DIN1, HIGH);
+    digitalWrite(DIN2, LOW);
     analogWrite(D_PWM, 0 - pwm);
   }
 }

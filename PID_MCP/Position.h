@@ -1,15 +1,15 @@
 #ifndef POSITION_H
 #define POSITION_H
 //Inputs
-//A is MCP, B is IP, C is CMC
-#define E1A 3
-#define E1B 4
-#define E2A 8
-#define E2B 9
+//A is index, B is middle, C is ring, D is pinky
+#define E1A 22
+#define E1B 23
+#define E2A 18
+#define E2B 19
 #define E3A 14
 #define E3B 15
-#define E4A 17
-#define E4B 20
+#define E4A 12
+#define E4B 13
 
 //Track the number of pulses from each motor
 volatile int numPulsesA = 0;
@@ -37,10 +37,10 @@ void readPulsesA() {
   int b = digitalRead(E1B);
 
   if (b > 0) {
-    numPulsesA++;
+    numPulsesA--;
   }
   else {
-    numPulsesA--;
+    numPulsesA++;
   }
 }
 
@@ -49,10 +49,10 @@ void readPulsesB() {
   int b = digitalRead(E2B);
 
   if (b > 0) {
-    numPulsesB++;
+    numPulsesB--;
   }
   else {
-    numPulsesB--;
+    numPulsesB++;
   }
 }
 
@@ -61,10 +61,10 @@ void readPulsesC() {
   int b = digitalRead(E3B);
 
   if (b > 0) {
-    numPulsesC++;
+    numPulsesC--;
   }
   else {
-    numPulsesC--;
+    numPulsesC++;
   }
 }
 
@@ -73,10 +73,10 @@ void readPulsesD() {
   int b = digitalRead(E4B);
 
   if (b > 0) {
-    numPulsesD++;
+    numPulsesD--;
   }
   else {
-    numPulsesD--;
+    numPulsesD++;
   }
 }
 
@@ -98,7 +98,6 @@ void setPosition() {
   
   //D's block
   dError = dTarget - numPulsesD;
-  Serial.println(numPulsesD);
   Set_PWMD(kp * dError);
   //End D's block
 }
