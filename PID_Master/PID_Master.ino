@@ -125,12 +125,40 @@ void transmitWrist(int left, int right) {
 
 void loop() {
   // Can set to angles between 0 radians and the maximum number of radians specified, all set to 0 for now
-  transmitThumb(0, 0, 0, 0);
+  // transmitThumb(0, 0, 0, 0);
+  // transmitMCP(0, 0, 0, 0);
+  // transmitPIP(0, 0, 0, 0);
+  // transmitDIP(0, 0, 0, 0);
+  // transmitAbduction(0.6);
+  // transmitWrist(2000, 2000); // Not currently working with wrist
+
+  transmitMCP(0, 0, 0, 1);
+  transmitPIP(0, 0, 0, 1);
+  transmitDIP(0, 0, 0, 1);
+
+  delay(3000);
+
+  transmitMCP(0, 0, 1, 0);
+  transmitPIP(0, 0, 1, 0);
+  transmitDIP(0, 0, 1, 0);
+
+  delay(3000);
+
+  transmitMCP(0, 1, 0, 0);
+  transmitPIP(0, 1, 0, 0);
+  transmitDIP(0, 1, 0, 0);
+
+  delay(3000);
+
+  transmitMCP(1, 0, 0, 0);
+  transmitPIP(1, 0, 0, 0);
+  transmitDIP(1, 0, 0, 0);
+
+  delay(3000);
+
   transmitMCP(0, 0, 0, 0);
   transmitPIP(0, 0, 0, 0);
   transmitDIP(0, 0, 0, 0);
-  // transmitAbduction(0);
-  // transmitWrist(2000, 2000); // Not currently working with wrist
 
-  delay(100);
+  delay(3000);
 }
