@@ -1,105 +1,101 @@
-//Outputs
-#define AIN1 4
-#define AIN2 5
-#define BIN1 6
-#define BIN2 7
-#define CIN1 8
-#define CIN2 9
-#define DIN1 10
-#define DIN2 11
+#ifndef MOTOR_H
+#define MOTOR_H
 
-void setupMotors() {
-  //Output setting
-  pinMode(AIN1, OUTPUT);
-  pinMode(AIN2, OUTPUT);
-  pinMode(BIN1, OUTPUT);
-  pinMode(BIN2, OUTPUT);
-  pinMode(CIN1, OUTPUT);
-  pinMode(CIN2, OUTPUT);
-  pinMode(DIN1, OUTPUT);
-  pinMode(DIN2, OUTPUT);
+#include <Encoder.h>
 
-  //First set all the pins to low
-  analogWrite(AIN1, LOW);
-  analogWrite(AIN2, LOW);
-  analogWrite(BIN1, LOW);
-  analogWrite(BIN2, LOW);
-  analogWrite(CIN1, LOW);
-  analogWrite(CIN2, LOW);
-  analogWrite(DIN1, LOW);
-  analogWrite(DIN2, LOW);
-}
+class Motor {
+private:
+  // Last recorded position error
+  int lastError;
 
-void checkBounds(int& pwm) {
-  if (pwm > 255) {
-    pwm = 255;
+  // Digital pins
+  byte D_PWM, D1, D2;
+
+  // Encoder associated with motor
+  Encoder enc;
+
+  // Time elapsed, used for PID
+  elapsedMillis sinceCtrl;
+
+  // Integral currently not used
+  static constexpr float Kp = 2.0f, Kd = 0.02f;
+
+  /**
+    Sets the PWM power
+    @param pwm_in signed pwm power, will be capped between -255 and 255
+    */
+  void setPWM(int pwm_in) {
+    if (pwm_in > 255) {
+      pwm_in = 255;
+    } else if (pwm_in < -255) {
+      pwm_in = -255;
+    }
+
+    if (pwm_in == 0) {
+      digitalWrite(D1, LOW);
+      digitalWrite(D2, LOW);
+      analogWrite(D_PWM, 0);
+    } else if (pwm_in > 0) {
+      digitalWrite(D1, LOW);
+      digitalWrite(D2, HIGH);
+      analogWrite(D_PWM, pwm_in);
+    } else {
+      digitalWrite(D1, HIGH);
+      digitalWrite(D2, LOW);
+      analogWrite(D_PWM, 0 - pwm_in);
+    }
   }
 
-  if (pwm < -255) {
-    pwm = -255;
-  }
-}
+public:
+  // We don't want the default constructor
+  Motor() = delete;
 
-//Set the speed of motor A
-void Set_PWMA(int pwm) {
-  checkBounds(pwm);
+  /**
+    @param _D_PWM the PWM pin
+    @param _D1 digital pin 1
+    @param _D2 digital pin 2
+    @param _en1 digital pin 1
+    @param _en2 encoder pin 2
+    */
+  Motor(byte _D_PWM, byte _D1, byte _D2, byte _en1, byte _en2)
+    : enc(_en2, _en1) {
+    D_PWM = _D_PWM;
+    D1 = _D1;
+    D2 = _D2;
+    lastError = 0;
 
-  if(pwm>0)
-  {
-    analogWrite(AIN1, 255 - pwm);
-    analogWrite(AIN2, 255);
-  }
-  else
-  {
-    analogWrite(AIN1, 255);
-    analogWrite(AIN2, 255 + pwm);
-  }
-}
+    pinMode(D1, OUTPUT);
+    pinMode(D2, OUTPUT);
+    pinMode(D_PWM, OUTPUT);
 
-//Set the speed of motor B
-void Set_PWMB(int pwm) {
-  checkBounds(pwm);
+    digitalWrite(D1, LOW);
+    digitalWrite(D2, LOW);
+    digitalWrite(D_PWM, 0);
 
-  if(pwm>0)
-  {
-    analogWrite(BIN1, 255 - pwm);
-    analogWrite(BIN2, 255);
+    enc.write(0);
   }
-  else
-  {
-    analogWrite(BIN1, 255);
-    analogWrite(BIN2, 255 + pwm);
-  }
-}
 
-//Set the speed of motor C
-void Set_PWMC(int pwm) {
-  checkBounds(pwm);
+  /**
+    Spins the motor to the target position
+    @param newTarget the target position in pulses
+    */
+  void spinToTarget(int newTarget) {
+    int pos = enc.read() / 4;
 
-  if(pwm>0)
-  {
-    analogWrite(CIN1, 255 - pwm);
-    analogWrite(CIN2, 255);
-  }
-  else
-  {
-    analogWrite(CIN1, 255);
-    analogWrite(CIN2, 255 + pwm);
-  }
-}
+    int error = newTarget - pos;
 
-//Set the speed of motor D
-void Set_PWMD(int pwm) {
-  checkBounds(pwm);
+    // Get inverse since multiplication is cheaper than division
+    float dt_inverse = 1e3f / sinceCtrl;
 
-  if(pwm>0)
-  {
-    analogWrite(DIN1, 255 - pwm);
-    analogWrite(DIN2, 255);
+    float derivative = (error - lastError) * dt_inverse;
+
+    int power = (int) (Kp * error + Kd * derivative);
+
+    setPWM(power);
+
+    lastError = error;
+    sinceCtrl = 0;
   }
-  else
-  {
-    analogWrite(DIN1, 255);
-    analogWrite(DIN2, 255 + pwm);
-  }
-}
+};
+
+#endif
