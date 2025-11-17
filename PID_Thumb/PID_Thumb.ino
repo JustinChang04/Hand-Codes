@@ -29,14 +29,13 @@
 #define E4A 12
 #define E4B 13
 
-Motor m1(A_PWM, AIN1, AIN2, E1A, E1B);
-Motor m2(B_PWM, BIN1, BIN2, E2A, E2B);
+Motor m1(A_PWM, AIN1, AIN2, E1B, E1A); // Hall effect sensors are swapped
+Motor m2(B_PWM, BIN1, BIN2, E2B, E2A); // Hall effect sensors are swapped
 Motor m3(C_PWM, CIN1, CIN2, E3A, E3B);
 Motor m4(D_PWM, DIN1, DIN2, E4A, E4B);
 
 int motorTargets[4] = { 0 };
-
-const int maxPulses = 3000;
+const int ranges[4] = {1800, 60, 2900, 3300}; // CMC, Pronation, MCP, IP
 
 extern "C" uint32_t set_arm_clock(uint32_t frequency);
 
@@ -47,7 +46,7 @@ void receiveEvent(int bytesRead) {
     Wire1.readBytes((byte*)data, 16);
 
     for (int i = 0; i < 4; i++) {
-      motorTargets[i] = (int)(data[i] * maxPulses);
+      motorTargets[i] = (int)(data[i] * ranges[i]);
     }
   }
 }
