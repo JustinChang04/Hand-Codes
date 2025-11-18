@@ -29,8 +29,8 @@
 #define E4A 12
 #define E4B 13
 
-Motor m1(A_PWM, AIN1, AIN2, E1B, E1A); // Hall effect sensors are swapped
-Motor m2(B_PWM, BIN1, BIN2, E2B, E2A); // Hall effect sensors are swapped
+Motor m1(A_PWM, AIN1, AIN2, E1A, E1B, 2.0f, 0.001f, 0.02f, 170);
+Motor m2(B_PWM, BIN2, BIN1, E2B, E2A, 5.0f, 0.001f, 0.02f, 255); // All pins must be reversed
 Motor m3(C_PWM, CIN1, CIN2, E3A, E3B);
 Motor m4(D_PWM, DIN1, DIN2, E4A, E4B);
 
@@ -65,10 +65,15 @@ void setup() {
 }
 
 void loop() {
-  m1.spinToTarget(motorTargets[0]);
-  m2.spinToTarget(motorTargets[1]);
-  m3.spinToTarget(motorTargets[2]);
-  m4.spinToTarget(motorTargets[3]);
+  // m1.spinToTarget(motorTargets[0]);   //
+  // m3.spinToTarget(motorTargets[2]);   // MCP
+  // m4.spinToTarget(motorTargets[3]);   // IP
+  
+  Serial.println(m2.getPosition());
+  // m1.spinToTarget(0.5*ranges[0]);   // CMC
+  m2.spinToTarget(ranges[1]);   //Pronation
+  // m3.spinToTarget(0.3*ranges[2]);   // MCP
+  // m4.spinToTarget(-0.5*ranges[3]);   // IP
 
   delay(10);
 }

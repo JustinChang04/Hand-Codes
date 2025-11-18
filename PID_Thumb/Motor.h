@@ -5,8 +5,7 @@
 
 class Motor {
 private:
-  // Last recorded position error
-  int lastError;
+  int lastError, cap;
 
   // Digital pins
   byte D_PWM, D1, D2;
@@ -14,22 +13,15 @@ private:
   // Encoder associated with motor
   Encoder enc;
 
-  // Time elapsed, used for PID
   elapsedMillis sinceCtrl;
 
-  // Integral currently not used
-  static constexpr float Kp = 2.0f, Kd = 0.02f;
+  // PID constants (INTEGRAL ADDED)
+  float Kp = 2.0f, Ki = 0.001f, Kd = 0.02f;
+  float integral;
 
-  /**
-    Sets the PWM power
-    @param pwm_in signed pwm power, will be capped between -255 and 255
-    */
   void setPWM(int pwm_in) {
-    if (pwm_in > 255) {
-      pwm_in = 255;
-    } else if (pwm_in < -255) {
-      pwm_in = -255;
-    }
+    if (pwm_in > cap) pwm_in = cap;
+    else if (pwm_in < -cap) pwm_in = -cap;
 
     if (pwm_in == 0) {
       digitalWrite(D1, LOW);
@@ -42,23 +34,19 @@ private:
     } else {
       digitalWrite(D1, HIGH);
       digitalWrite(D2, LOW);
-      analogWrite(D_PWM, 0 - pwm_in);
+      analogWrite(D_PWM, -pwm_in);
     }
   }
 
 public:
-  // We don't want the default constructor
   Motor() = delete;
 
-  /**
-    @param _D_PWM the PWM pin
-    @param _D1 digital pin 1
-    @param _D2 digital pin 2
-    @param _en1 digital pin 1
-    @param _en2 encoder pin 2
-    */
   Motor(byte _D_PWM, byte _D1, byte _D2, byte _en1, byte _en2)
     : enc(_en2, _en1) {
+
+    Kp = 2.0f, Ki = 0.001f, Kd = 0.02f;
+    cap = 255;
+
     D_PWM = _D_PWM;
     D1 = _D1;
     D2 = _D2;
@@ -73,23 +61,55 @@ public:
     digitalWrite(D_PWM, 0);
 
     enc.write(0);
+    integral = 0;                    // <-- ADDED
   }
 
-  /**
-    Spins the motor to the target position
-    @param newTarget the target position in pulses
-    */
+  Motor(byte _D_PWM, byte _D1, byte _D2, byte _en1, byte _en2, float _Kp, float _Ki, float _Kd, int _cap)
+    : enc(_en2, _en1) {
+
+    Kp = _Kp, Ki = _Ki, Kd = _Kd;
+    cap = _cap;
+
+    D_PWM = _D_PWM;
+    D1 = _D1;
+    D2 = _D2;
+    lastError = 0;
+
+    pinMode(D1, OUTPUT);
+    pinMode(D2, OUTPUT);
+    pinMode(D_PWM, OUTPUT);
+
+    digitalWrite(D1, LOW);
+    digitalWrite(D2, LOW);
+    digitalWrite(D_PWM, 0);
+
+    enc.write(0);
+    integral = 0;                    // <-- ADDED
+  }
+
   void spinToTarget(int newTarget) {
     int pos = enc.read() / 4;
-
     int error = newTarget - pos;
 
-    // Get inverse since multiplication is cheaper than division
-    float dt_inverse = 1e3f / sinceCtrl;
+    float dt_ms = sinceCtrl;
+    float dt = dt_ms / 1000.0f;      // convert ms → sec
+    if (dt < 0.0001f) dt = 0.0001f;  // avoid divide-by-zero
 
-    float derivative = (error - lastError) * dt_inverse;
+    float derivative = (error - lastError) / dt;
 
-    int power = (int) (Kp * error + Kd * derivative);
+    // ---- INTEGRAL TERM ----
+    integral += error * dt;          // <-- ADDED
+
+    // Anti-windup            // <-- ADDED
+    if (integral > 3000) integral = 3000;
+    else if (integral < -3000) integral = -3000;
+
+    // PID OUTPUT
+    int power = (int)(
+      Kp * error +
+      Ki * integral +               // <-- ADDED
+      Kd * derivative
+    );
 
     setPWM(power);
 
