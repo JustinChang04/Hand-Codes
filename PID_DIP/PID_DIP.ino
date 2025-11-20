@@ -71,5 +71,9 @@ void loop() {
   m3.spinToTarget(motorTargets[2]);
   m4.spinToTarget(motorTargets[3]);
 
+  Serial.println(motorTargets[0]);
+  Serial.print(" ");
+  Serial.println(m1.getPosition());
+
   delay(10);
 }

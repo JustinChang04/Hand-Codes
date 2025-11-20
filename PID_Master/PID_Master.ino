@@ -36,36 +36,29 @@ void setup() {
   delay(1000);
 }
 
-void normalize(float& value, float limit) {
-  if (value > limit) {
-    value = limit;
-  }
-  else if (value < 0) {
-    value = 0;
+void normalize(float* arr, int size) {
+  for (int i = 0; i < size; i++) {
+    if (arr[i] > 1) {
+      arr[i] = 1;
+    }
+    else if (arr[i] < 0) {
+      arr[i] = 0;
+    }
   }
 }
 
-void transmitThumb(float CMC, float New, float MCP, float IP) {
-  normalize(CMC, THUMB_CMC);
-  normalize(New, THUMB_NEW);
-  normalize(MCP, THUMB_MCP);
-  normalize(IP, THUMB_IP);
+void transmitThumb(float CMC, float Supination, float MCP, float IP) {
+  float data[4] = {CMC * THUMB_CMC, Supination * THUMB_NEW, MCP * THUMB_MCP, IP * THUMB_IP};
+  normalize(data, 4);
 
   Wire.beginTransmission(8);
-  float data[4] = {CMC * THUMB_CMC, New * THUMB_NEW, MCP * THUMB_MCP, IP * THUMB_IP};
-
   Wire.write((uint8_t*) data, 16);
-
   Wire.endTransmission();
 }
 
 void transmitMCP(float m1, float m2, float m3, float m4) {
-  normalize(m1, MCP_INDEX);
-  normalize(m2, MCP_MIDDLE);
-  normalize(m3, MCP_RING);
-  normalize(m4, MCP_PINKY);
-
   float data[4] = {m1 * MCP_INDEX, m2 * MCP_MIDDLE, m3 * MCP_RING, m4 * MCP_PINKY};
+  normalize(data, 4);
   
   Wire.beginTransmission(9);
   Wire.write((byte*) data, 16);
@@ -73,40 +66,29 @@ void transmitMCP(float m1, float m2, float m3, float m4) {
 }
 
 void transmitPIP(float p1, float p2, float p3, float p4) {
-  normalize(p1, PIP_INDEX);
-  normalize(p2, PIP_MIDDLE);
-  normalize(p3, PIP_RING);
-  normalize(p4, PIP_PINKY);
+  float data[4] = {p1 * PIP_INDEX, p2 * PIP_MIDDLE, p3 * PIP_RING, p4 * PIP_PINKY};
+  normalize(data, 4);
 
   Wire.beginTransmission(10);
-  float data[4] = {p1 * PIP_INDEX, p2 * PIP_MIDDLE, p3 * PIP_RING, p4 * PIP_PINKY};
-
   Wire.write((uint8_t*) data, 16);
-
   Wire.endTransmission();
 }
 
 void transmitDIP(float d1, float d2, float d3, float d4) {
-  normalize(d1, DIP_INDEX);
-  normalize(d2, DIP_MIDDLE);
-  normalize(d3, DIP_RING);
-  normalize(d4, DIP_PINKY);
+  float data[4] = {d1 * DIP_INDEX, d2 * DIP_MIDDLE, d3 * DIP_RING, d4 * DIP_PINKY};
+  normalize(data, 4);
 
   Wire.beginTransmission(11);
-  float data[4] = {d1 * DIP_INDEX, d2 * DIP_MIDDLE, d3 * DIP_RING, d4 * DIP_PINKY};
-
   Wire.write((uint8_t*) data, 16);
-
   Wire.endTransmission();
 }
 
-void transmitAbduction(float angle) {
+void transmitAbduction(float percent) {
+  float copy = percent;
+  normalize(&copy, 1);
+
   Wire.beginTransmission(12);
-
-  float copy = angle;
-
   Wire.write((byte*) &copy, sizeof(float));
-
   Wire.endTransmission();
 }
 
@@ -134,9 +116,9 @@ void loop() {
 
   delay(3000);
 
-  transmitMCP(0, 2, 0, 0);
-  transmitPIP(0, 1, 0, 0);
-  transmitDIP(0, 2, 0, 0);
+  transmitMCP(1.6, 1.6, 1.6, 1.6);
+  transmitPIP(1, 1, 1, 1);
+  transmitDIP(0.5, 0.5, 0.5, 0.5);
 
   delay(3000);
 

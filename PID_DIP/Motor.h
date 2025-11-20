@@ -96,6 +96,10 @@ public:
     lastError = error;
     sinceCtrl = 0;
   }
+
+  inline int getPosition() {
+    return enc.read() / 4;
+  }
 };
 
 #endif
