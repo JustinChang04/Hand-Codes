@@ -9,7 +9,7 @@ const float THUMB_IP = 1.0 / 0.7858;
 
 const float MCP_INDEX = 1.0 / 1.8002;
 const float PIP_INDEX = 1.0 / 1.3104;
-const float DIP_INDEX = 1.0 / 1.1885;
+const float DIP_INDEX = 1.0 / 1.1885; // USE AT MOST 0.9
 
 const float MCP_MIDDLE = 1.0 / 1.7791;
 const float PIP_MIDDLE = 1.0 / 1.2823;
@@ -116,13 +116,18 @@ void loop() {
 
   delay(3000);
 
-  transmitMCP(1.6, 1.6, 1.6, 1.6);
-  transmitPIP(1, 1, 1, 1);
-  transmitDIP(0.5, 0.5, 0.5, 0.5);
+  transmitMCP(0, 0, 0, 0);
+  delay(1);
+  transmitPIP(0, -1, 0, 0);
+  delay(1);
+  transmitDIP(0, 0, 0, 0);
 
   delay(3000);
 
   transmitMCP(0, 0, 0, 0);
+  delay(1);
   transmitPIP(0, 0, 0, 0);
+  delay(1);
   transmitDIP(0, 0, 0, 0);
 }
+

@@ -30,12 +30,12 @@
 #define E4B 13
 
 Motor m1(A_PWM, AIN1, AIN2, E1A, E1B, 2.0f, 0.001f, 0.02f, 170);
-Motor m2(B_PWM, BIN2, BIN1, E2B, E2A, 5.0f, 0.001f, 0.02f, 255); // All pins must be reversed
+Motor m2(B_PWM, BIN2, BIN1, E2B, E2A, 10.0f, 0.001f, 0.02f, 255); // All pins must be reversed
 Motor m3(C_PWM, CIN1, CIN2, E3A, E3B);
 Motor m4(D_PWM, DIN1, DIN2, E4A, E4B);
 
 int motorTargets[4] = { 0 };
-const int ranges[4] = {1800, 60, 2900, 3300}; // CMC, Pronation, MCP, IP
+const int ranges[4] = {1800, 130, 2900, 3300}; // CMC, Pronation, MCP, IP
 
 extern "C" uint32_t set_arm_clock(uint32_t frequency);
 
@@ -71,7 +71,7 @@ void loop() {
   
   Serial.println(m2.getPosition());
   // m1.spinToTarget(0.5*ranges[0]);   // CMC
-  m2.spinToTarget(ranges[1]);   //Pronation
+  m2.spinToTarget(130);   //Pronation
   // m3.spinToTarget(0.3*ranges[2]);   // MCP
   // m4.spinToTarget(-0.5*ranges[3]);   // IP
 
